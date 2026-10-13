@@ -20,8 +20,9 @@
 #
 # Behaviour: if no review is in progress for the current branch, it does nothing
 # (exit 0). Otherwise it cancels every in-flight run of that workflow on the
-# branch — so none can post stale findings — and reruns the most recent run
-# against the current HEAD.
+# branch — so none can post stale findings — and reruns the most recent run.
+# `gh run rerun` reuses that run's commit; after a push the most recent run is
+# the one the push triggered, so it already targets the new HEAD.
 
 set -uo pipefail
 
@@ -66,6 +67,10 @@ while [ "$i" -lt 30 ]; do
   sleep 2
   i=$((i + 1))
 done
+if [ "$st" != "completed" ]; then
+  echo "restart-review: run $latest still '${st:-unknown}' after ~60s; not rerunning" >&2
+  exit 1
+fi
 
 echo "restart-review: rerunning review (run $latest, branch $branch)"
 gh run rerun "$latest"

@@ -7,7 +7,7 @@
   "plugins": [
     {
       "name": "babysit-pr",
-      "description": "Local equivalent of autofix-pr: monitor and fix the current PR (CI failures, review comments, merge conflicts) in the local Claude Code session instead of a remote cloud session",
+      "description": "Local equivalent of autofix-pr: monitor and fix the current PR (CI failures, review comments, merge conflicts) in the local Claude Code session, then merge it and delete its branch once a pass is clean",
       "source": "./plugins/babysit-pr"
     },
     {
@@ -47,7 +47,7 @@
     },
     {
       "name": "teach-me",
-      "description": "Interactive tutor that guides you to a deep understanding of a subject (a code change, PR, file, or abstract topic) incrementally — a running checklist in markdown or HTML (your pick); explains from zero first, checks every step with a click-through multiple-choice question and explicit right/wrong feedback, drills into the \"why\", and raises the difficulty as you progress; doesn't finish until full understanding is verified.",
+      "description": "Interactive tutor for a code change, PR, file, or abstract topic: explains at your chosen level, checks every step with a multiple-choice question and explicit right/wrong feedback, drills into the \"why\", and adapts the difficulty as you go; tracks verified items in a markdown or HTML checklist you can pause and resume.",
       "source": "./plugins/teach-me"
     },
     {

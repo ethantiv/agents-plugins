@@ -10,7 +10,7 @@ A plugin marketplace for [Claude Code](https://claude.com/claude-code), with Cod
 | **babysit-pr** | universal | A local equivalent of `autofix-pr`: it watches the current pull request and fixes it in your Claude Code session, covering CI failures, review comments that request changes, and merge conflicts. After one clean pass it merges the PR and deletes the branch. Run it with `--loop` to keep watching on an interval, or `--push` to commit, push, and open the PR first. |
 | **read-arxiv-paper** | universal | Downloads the LaTeX source of an arXiv paper, analyzes it, and writes a summary grounded in the context of your project. |
 | **roadmap** | universal | Generates `docs/ROADMAP.md` with an agent swarm: multiple perspectives propose features, then a panel of product managers scores them for usefulness, sellability, and wow factor. |
-| **teach-me** | universal | An interactive tutor that walks you step by step to a deep understanding of a topic (a code change, a PR, a file, or an abstract concept): it explains from zero first, checks each step with a quiz, tells you whether you were right and why, and raises the difficulty as you progress. It doesn't stop until your understanding is confirmed. |
+| **teach-me** | Polish by default | An interactive tutor that walks you step by step to a deep understanding of a topic (a code change, a PR, a file, or an abstract concept): it explains at the level you choose, checks each step with a quiz, tells you whether you were right and why, and adapts the difficulty as you progress. Verified items go into a checklist file, so you can pause and resume. |
 | **visual-prompt** | universal | Generates three `.txt` files with artistic text-to-image prompts in three contrasting directions, written in parallel by separate subagents in the conversation language. Two profiles: `art` (artwork, posters, photography) and `ui` (artistic interface mockups). Commands: `/visual-prompt-art`, `/visual-prompt-ui`. |
 | **dependency-update** | universal | Scans your project's dependencies across all ecosystems and updates them safely: minor/patch in one pass, majors one at a time with separate research for each. |
 | **eli** | universal | Explain like I'm an intern: explains any concept, term, or piece of code to a smart person who lacks the domain knowledge. Short, concrete, example-driven, no padding. |
@@ -90,6 +90,8 @@ npx agent-browser open example.com
 **babysit-pr**
 
 - `gh` (GitHub CLI, logged in), `jq`, and `git` available in `PATH`.
+- Optional: the `commit-commands` plugin for `--push` (without it, the skill commits and opens the PR with `git` and `gh`).
+- Optional: `BABYSIT_MERGE_METHOD` (`merge`, `squash`, or `rebase`; default `merge`) and `BABYSIT_REVIEW_WORKFLOW` (review workflow file; default `claude-code-review.yml`).
 
 **read-arxiv-paper**
 
@@ -105,7 +107,7 @@ npx agent-browser open example.com
 
 **teach-me**
 
-- Bash for randomizing quiz choices; Git for code-change lessons and authenticated `gh` for GitHub PR lessons.
+- Optional: a shell for randomizing quiz choices; Git for code-change lessons and authenticated `gh` for GitHub PR lessons.
 
 **visual-prompt**
 
@@ -123,7 +125,7 @@ After installation, each plugin exposes its skills as `/<plugin>:<skill>` comman
 - **babysit-pr**: Run `/babysit-pr` on a branch with an open PR to monitor and fix CI, reviews, and conflicts locally; once a pass completes without issues, it merges the PR and deletes the branch. `/babysit-pr --loop 10m` keeps watching by re-running the check every 10 minutes (you choose the interval). If you have no open PR, run `/babysit-pr --push` to commit your work, push it, open the PR, and start the same watch loop.
 - **read-arxiv-paper**: Run `/read-arxiv-paper:read-arxiv-paper` with a paper URL or ID (for example, `2401.12345`) to get a summary in the context of your repository.
 - **roadmap**: Run `/roadmap:roadmap` to gather ideas with an agent swarm and write `docs/ROADMAP.md`.
-- **teach-me**: Run `/teach-me:teach-me` with a topic (a code change, a PR, a file, or a concept); it explains first, checks each step, and raises the difficulty until your understanding is confirmed.
+- **teach-me**: Run `/teach-me:teach-me` with a topic (a code change, a PR, a file, or a concept); it explains first, checks each step, adapts the difficulty, and lets you pause and resume (type `pauza`).
 - **visual-prompt**: Run `/visual-prompt-art` or `/visual-prompt-ui` (or describe what you need) to generate three `.txt` files with prompts in contrasting directions.
 - **dependency-update**: Run `/dependency-update:dependency-update` to scan and safely update your project's dependencies.
 - **eli**: Run `/eli:eli` with a concept, term, or piece of code to get a short, vivid explanation.

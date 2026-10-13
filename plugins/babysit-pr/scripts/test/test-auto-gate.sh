@@ -1,21 +1,12 @@
 #!/usr/bin/env bash
 #
-# Self-check for auto-gate.sh: runs it inside a throwaway git repo and asserts
-# only a positively-green snapshot reads as clean.
+# Self-check for auto-gate.sh: asserts only a positively-green snapshot reads
+# as clean, and that the merge sha is the PR head from the snapshot.
 
 set -uo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 gate="$script_dir/../auto-gate.sh"
-
-tmp="$(mktemp -d)"
-trap 'rm -rf "$tmp"' EXIT
-cd "$tmp" || exit 1
-
-git init -q
-git config user.email test@test.local
-git config user.name test
-git commit -q --allow-empty -m init
 
 fail=0
 field() { printf '%s' "$1" | jq -r ".$2"; }
@@ -29,23 +20,29 @@ assert() {
   fi
 }
 
-clean_snapshot='{"status":"ok","number":42,"mergeStateStatus":"CLEAN","has_conflicts":false,"failing_checks":[],"pending_checks":[],"review_threads":[],"changes_requested":[]}'
-dirty_snapshot='{"status":"ok","number":42,"mergeStateStatus":"BLOCKED","has_conflicts":false,"failing_checks":[],"pending_checks":[],"review_threads":[],"changes_requested":[]}'
-thread_snapshot='{"status":"ok","number":42,"mergeStateStatus":"CLEAN","has_conflicts":false,"failing_checks":[],"pending_checks":[],"review_threads":[{"thread_id":"x"}],"changes_requested":[]}'
-pending_snapshot='{"status":"ok","number":42,"mergeStateStatus":"CLEAN","has_conflicts":false,"failing_checks":[],"pending_checks":[{"name":"ci"}],"review_threads":[],"changes_requested":[]}'
+clean_snapshot='{"status":"ok","number":42,"head_sha":"abc123","mergeStateStatus":"CLEAN","has_conflicts":false,"failing_checks":[],"pending_checks":[],"review_threads":[],"changes_requested":[],"unpushed_local_commits":false}'
+variant() { printf '%s' "$clean_snapshot" | jq -c "$1"; }
+gate_clean() { field "$(printf '%s' "$1" | bash "$gate")" clean; }
 
 # 1: a single clean pass is enough to merge
 out="$(printf '%s' "$clean_snapshot" | bash "$gate")"
 assert "clean" "$(field "$out" clean)" "true"
-assert "clean sha" "$(field "$out" sha)" "$(git rev-parse HEAD)"
+assert "clean sha is PR head" "$(field "$out" sha)" "abc123"
 
 # 2: mergeStateStatus != CLEAN -> not clean
-assert "blocked not clean" "$(field "$(printf '%s' "$dirty_snapshot" | bash "$gate")" clean)" "false"
+assert "blocked not clean" "$(gate_clean "$(variant '.mergeStateStatus="BLOCKED"')")" "false"
 
 # 3: open review thread despite CLEAN -> not clean
-assert "open thread not clean" "$(field "$(printf '%s' "$thread_snapshot" | bash "$gate")" clean)" "false"
+assert "open thread not clean" "$(gate_clean "$(variant '.review_threads=[{"thread_id":"x"}]')")" "false"
 
 # 4: pending check despite CLEAN -> not clean
-assert "pending check not clean" "$(field "$(printf '%s' "$pending_snapshot" | bash "$gate")" clean)" "false"
+assert "pending check not clean" "$(gate_clean "$(variant '.pending_checks=[{"name":"ci"}]')")" "false"
+
+# 5: local fix not yet pushed -> not clean
+assert "unpushed not clean" "$(gate_clean "$(variant '.unpushed_local_commits=true')")" "false"
+
+# 6: snapshot without head_sha -> gate refuses
+printf '%s' "$(variant 'del(.head_sha)')" | bash "$gate" >/dev/null 2>&1
+assert "missing head_sha fails" "$?" "1"
 
 exit $fail
