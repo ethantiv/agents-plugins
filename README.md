@@ -12,10 +12,10 @@ A plugin marketplace for [Claude Code](https://claude.com/claude-code), with Cod
 | **roadmap** | universal | Generates `docs/ROADMAP.md` with an agent swarm: multiple perspectives propose features, then a panel of product managers scores them for usefulness, sellability, and wow factor. |
 | **teach-me** | Polish by default | An interactive tutor that walks you step by step to a deep understanding of a topic (a code change, a PR, a file, or an abstract concept): it explains at the level you choose, checks each step with a quiz, tells you whether you were right and why, and adapts the difficulty as you progress. Verified items go into a checklist file, so you can pause and resume. |
 | **visual-prompt** | universal | Generates three `.txt` files with artistic text-to-image prompts in three contrasting directions, written in parallel by separate subagents in the conversation language. Two profiles: `art` (artwork, posters, photography) and `ui` (artistic interface mockups). Commands: `/visual-prompt-art`, `/visual-prompt-ui`. |
-| **dependency-update** | universal | Scans your project's dependencies across all ecosystems and updates them safely: minor/patch in one pass, majors one at a time with separate research for each. |
+| **dependency-update** | universal | Scans your project's dependencies across all ecosystems and updates them safely: minor and patch updates in one pass, major updates one at a time with separate research for each. |
 | **eli** | universal | Explain like I'm an intern: explains any concept, term, or piece of code to a smart person who lacks the domain knowledge. Short, concrete, example-driven, no padding. |
 | **docstyle** | universal | Applies the [Google developer documentation style guide](https://developers.google.com/style) to technical docs. `/docstyle` edits files in place (or reports findings with `--audit`) and activates automatically when you create or edit technical documentation. It does not style chat replies or install session hooks. Ships the full guide (70 pages) as local references with a topic index. |
-| **unslop** | universal | Edits LLM-generated documents in place to remove the telltale signs of AI writing catalogued by Wikipedia's ["Signs of AI writing"](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing): AI vocabulary, negative parallelisms, rule of three, promotional tone, vague attributions, throat-clearing, fake-profound kickers, formatting slop—plus Polish officialese and bureaucratic heaviness. Handles Polish and English. Audit mode reports findings with red/yellow/green severity instead of editing; `/unslop:plain` rewrites Polish into plain language (a deliberate register change). The plugin provides skills only; it does not inject instructions at session start. |
+| **unslop** | universal | Edits LLM-generated documents in place to remove the telltale signs of AI writing catalogued by Wikipedia's ["Signs of AI writing"](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing): AI vocabulary, negative parallelisms, rule of three, promotional tone, vague attributions, throat-clearing, fake-profound kickers, formatting slop—plus Polish officialese and bureaucratic heaviness. Handles Polish and English. Audit mode reports findings with red, yellow, or green severity instead of editing; `/unslop:plain` rewrites Polish into plain language (a deliberate register change). The plugin provides skills only; it does not inject instructions at session start. |
 
 ## Installation
 
@@ -51,7 +51,7 @@ claude plugin install docstyle@ethantiv-plugins
 claude plugin install unslop@ethantiv-plugins
 ```
 
-Install only what you need; the plugins are independent of each other. After installing, verify the installation:
+Install only what you need; the plugins are independent of each other. To verify the installation, run the following command:
 
 ```bash
 claude plugin marketplace list
@@ -111,7 +111,7 @@ npx agent-browser open example.com
 
 **visual-prompt**
 
-- Native subagent tools: Workflow/Agent in Claude Code, `spawn_agent` in Codex, or `task` in Copilot CLI. Without delegation, the skill asks before producing the three directions sequentially.
+- Native subagent tools: Workflow or Agent in Claude Code, `spawn_agent` in Codex, or `task` in Copilot CLI. Without delegation, the skill asks before producing the three directions sequentially.
 
 **dependency-update**
 
@@ -145,7 +145,7 @@ codex plugin add teach-me@ethantiv-plugins
 codex plugin add docstyle@ethantiv-plugins
 ```
 
-For local development, register the repository directory instead of the GitHub source. Restart the session after installation. Invoke `$unslop:unslop`, `$unslop:plain`, `$eli:eli`, `$visual-prompt:visual-prompt`, `$visual-prompt:visual-prompt-art`, `$visual-prompt:visual-prompt-ui`, `$teach-me:teach-me`, or `$docstyle:docstyle`.
+For local development, register the repository directory instead of the GitHub source. After installation, restart the session. Invoke `$unslop:unslop`, `$unslop:plain`, `$eli:eli`, `$visual-prompt:visual-prompt`, `$visual-prompt:visual-prompt-art`, `$visual-prompt:visual-prompt-ui`, `$teach-me:teach-me`, or `$docstyle:docstyle`.
 
 Skills use the tools available in their host; teach-me falls back to numbered chat choices when Codex has no interactive question tool. Visual-prompt uses Codex subagents when available.
 
@@ -162,7 +162,7 @@ copilot plugin install visual-prompt@ethantiv-plugins
 copilot plugin install docstyle@ethantiv-plugins
 ```
 
-Start a new session after installation. Invoke `/eli`, `/teach-me`, `/unslop`, `/plain`, `/visual-prompt`, `/visual-prompt-art`, `/visual-prompt-ui`, or `/docstyle`. If another installed plugin has the same skill name, use the skill picker.
+After installation, start a new session. Invoke `/eli`, `/teach-me`, `/unslop`, `/plain`, `/visual-prompt`, `/visual-prompt-art`, `/visual-prompt-ui`, or `/docstyle`. If another installed plugin has the same skill name, use the skill picker.
 
 Teach-me uses `ask_user` when available and otherwise waits for numbered choices in chat. Visual-prompt uses native subagents. See the [Copilot CLI skill and tool reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-command-reference).
 
