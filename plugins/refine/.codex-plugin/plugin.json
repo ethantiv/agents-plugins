@@ -1,6 +1,6 @@
 {
   "name": "refine",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Rewrite a chaotic, stream-of-consciousness prompt into a clear, structured one that keeps every real requirement, then ask whether to accept it (the agent starts working on it), revise it with your notes, or reject it.",
   "author": {
     "name": "Mirek Zaniewicz"

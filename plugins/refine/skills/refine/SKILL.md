@@ -30,11 +30,13 @@ Rewrite the raw prompt into a clear, well-structured prompt that faithfully pres
 Example:
 
 - Input: "ok so i want to uh add a login page, actually make it a login AND signup page, use react, oh and it should you know validate the email, wait no just the password for now, min 8 chars"
-- Output: `<refined>Add a combined login and signup page built with React. For now, validate only the password (minimum 8 characters).</refined>`
+- Output:
+
+  > Add a combined login and signup page built with React. For now, validate only the password (minimum 8 characters).
 
 ## Step 2 — show and ask
 
-Print the refined prompt wrapped in `<refined></refined>` tags, with no preamble or commentary. Then ask one closed question in the user's language with exactly these three options (Polish labels shown; translate for other languages):
+Print the refined prompt as a Markdown blockquote: prefix every line with `> ` (use a bare `>` for blank lines inside it), with no tags, preamble, or commentary. Then ask one closed question in the user's language with exactly these three options (Polish labels shown; translate for other languages):
 
 1. **Akceptuję** — run this prompt now.
 2. **Poprawiam** — give notes and get a new version.
