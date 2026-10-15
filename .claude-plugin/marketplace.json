@@ -54,6 +54,11 @@
       "name": "visual-prompt",
       "description": "Generate three .txt files with artistic text-to-image prompts in three contrasting visual directions, written by separate subagents in parallel in the conversation language. Two profiles: art (artwork, posters, photography) and ui (artistic interface mockups). Slash-invocable skills: /visual-prompt-art, /visual-prompt-ui.",
       "source": "./plugins/visual-prompt"
+    },
+    {
+      "name": "refine",
+      "description": "Rewrite a chaotic, stream-of-consciousness prompt into a clear, structured one that keeps every real requirement, then ask whether to accept it (the agent starts working on it), revise it with your notes, or reject it.",
+      "source": "./plugins/refine"
     }
   ]
 }
