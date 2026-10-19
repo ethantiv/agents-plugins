@@ -38,13 +38,14 @@ Print the refined prompt as plain text, with no blockquote (`>`), code fence, ta
 
 1. **Akceptuję** — run this prompt now.
 2. **Poprawiam** — give notes and get a new version.
-3. **Kopiuj prompt** — copy the refined prompt to the clipboard, run nothing.
+3. **Kopiuj prompt** — copy the refined prompt to the clipboard, run nothing. In Claude Code the option description reads: "Pokażę sam prompt, potem wpisz /copy".
 4. **Odrzucam** — drop it, do nothing.
 
 ## Step 3 — act on the choice
 
 - **Akceptuję** → treat the refined prompt as the user's new request and carry it out now, exactly as if the user had typed it. The refinement rules no longer apply; work normally.
 - **Poprawiam** → ask in one sentence what to change and wait. Apply the notes to the current refined prompt (the notes override it where they conflict, under the same rules as Step 1), then repeat Step 2. Loop until the user accepts or rejects.
-- **Kopiuj prompt** → copy the refined prompt, exactly as shown, to the system clipboard with the shell tool and do nothing else. Pipe it through a quoted heredoc (`cat <<'REFINE_EOF' | <cmd>`) into the first clipboard command that exists: `pbcopy` (macOS), `wl-copy` (Wayland), `xclip -selection clipboard`, `xsel --clipboard --input` (X11), or `clip.exe` (Windows, WSL). Reply with one short line confirming the copy, and stop. If no clipboard command works (for example in a container or over SSH), say so in one line and print the refined prompt in a code fence for manual copying. Do not act on the raw or the refined prompt.
+- **Kopiuj prompt** in Claude Code → run no tools. Reply with the refined prompt exactly as shown and nothing else (no preamble, confirmation, fence, or blockquote), and stop: the user's built-in `/copy` copies the last response to the clipboard, also inside containers and over SSH. Do not act on the raw or the refined prompt.
+- **Kopiuj prompt** in other hosts → copy the refined prompt, exactly as shown, to the system clipboard with the shell tool and do nothing else. Pipe it through a quoted heredoc (`cat <<'REFINE_EOF' | <cmd>`) into the first clipboard command that exists: `pbcopy` (macOS), `wl-copy` (Wayland), `xclip -selection clipboard`, `xsel --clipboard --input` (X11), or `clip.exe` (Windows, WSL). Reply with one short line confirming the copy, and stop. If no clipboard command works (for example in a container or over SSH), say so in one line and print the refined prompt in a code fence for manual copying. Do not act on the raw or the refined prompt.
 - **Odrzucam** → reply with one short line confirming nothing was done, and stop. Do not act on the raw or the refined prompt.
 - **Any other free-text answer** → treat it as revision notes (the **Poprawiam** path).
