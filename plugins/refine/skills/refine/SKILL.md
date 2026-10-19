@@ -1,7 +1,7 @@
 ---
 name: refine
 description: >-
-  This skill should be used when the user wants a raw, chaotic, stream-of-consciousness prompt cleaned up before it is executed: filler words, false starts, typos, self-corrections, contradictions, and scattered ideas rewritten into a clear, structured prompt that keeps every real requirement. Shows the refined prompt and asks the user to accept it (then carries it out), revise it with notes, or reject it. Triggers: "popraw ten prompt", "uporządkuj prompt", "wyczyść mój prompt", "zrób z tego porządny prompt", "refine this prompt", "clean up my prompt", "tidy this prompt", "/refine".
+  This skill should be used when the user wants a raw, chaotic, stream-of-consciousness prompt cleaned up before it is executed: filler words, false starts, typos, self-corrections, contradictions, and scattered ideas rewritten into a clear, structured prompt that keeps every real requirement. Shows the refined prompt and asks the user to accept it (then carries it out), revise it with notes, copy it to the clipboard, or reject it. Triggers: "popraw ten prompt", "uporządkuj prompt", "wyczyść mój prompt", "zrób z tego porządny prompt", "refine this prompt", "clean up my prompt", "tidy this prompt", "/refine".
 argument-hint: "<raw, unpolished prompt>"
 ---
 
@@ -11,7 +11,7 @@ Take the raw prompt in `$ARGUMENTS` (or, when that is unavailable, the user's me
 
 ## Agent compatibility
 
-Invoke as `/refine:refine` in Claude Code, `$refine:refine` in Codex, or `/refine` in Copilot CLI. The closed-question interface means `AskUserQuestion` in Claude Code, `ask_user` in Copilot CLI, or `request_user_input` in Codex when the current mode offers it. When none is available, show the same three options as a numbered list in chat and wait for the answer; never assume a choice.
+Invoke as `/refine:refine` in Claude Code, `$refine:refine` in Codex, or `/refine` in Copilot CLI. The closed-question interface means `AskUserQuestion` in Claude Code, `ask_user` in Copilot CLI, or `request_user_input` in Codex when the current mode offers it. When none is available, show the same four options as a numbered list in chat and wait for the answer; never assume a choice.
 
 ## Step 1 — refine
 
@@ -34,15 +34,17 @@ Example:
 
 ## Step 2 — show and ask
 
-Print the refined prompt as plain text, with no blockquote (`>`), code fence, tags, preamble, or commentary. Then ask one closed question in the user's language with exactly these three options (Polish labels shown; translate for other languages):
+Print the refined prompt as plain text, with no blockquote (`>`), code fence, tags, preamble, or commentary. Then ask one closed question in the user's language with exactly these four options (Polish labels shown; translate for other languages):
 
 1. **Akceptuję** — run this prompt now.
 2. **Poprawiam** — give notes and get a new version.
-3. **Odrzucam** — drop it, do nothing.
+3. **Kopiuj prompt** — copy the refined prompt to the clipboard, run nothing.
+4. **Odrzucam** — drop it, do nothing.
 
 ## Step 3 — act on the choice
 
 - **Akceptuję** → treat the refined prompt as the user's new request and carry it out now, exactly as if the user had typed it. The refinement rules no longer apply; work normally.
 - **Poprawiam** → ask in one sentence what to change and wait. Apply the notes to the current refined prompt (the notes override it where they conflict, under the same rules as Step 1), then repeat Step 2. Loop until the user accepts or rejects.
+- **Kopiuj prompt** → copy the refined prompt, exactly as shown, to the system clipboard with the shell tool and do nothing else. Pipe it through a quoted heredoc (`cat <<'REFINE_EOF' | <cmd>`) into the first clipboard command that exists: `pbcopy` (macOS), `wl-copy` (Wayland), `xclip -selection clipboard`, `xsel --clipboard --input` (X11), or `clip.exe` (Windows, WSL). Reply with one short line confirming the copy, and stop. If no clipboard command works (for example in a container or over SSH), say so in one line and print the refined prompt in a code fence for manual copying. Do not act on the raw or the refined prompt.
 - **Odrzucam** → reply with one short line confirming nothing was done, and stop. Do not act on the raw or the refined prompt.
 - **Any other free-text answer** → treat it as revision notes (the **Poprawiam** path).

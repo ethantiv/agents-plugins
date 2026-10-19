@@ -57,7 +57,7 @@
     },
     {
       "name": "refine",
-      "description": "Rewrite a chaotic, stream-of-consciousness prompt into a clear, structured one that keeps every real requirement, then ask whether to accept it (the agent starts working on it), revise it with your notes, or reject it.",
+      "description": "Rewrite a chaotic, stream-of-consciousness prompt into a clear, structured one that keeps every real requirement, then ask whether to accept it (the agent starts working on it), revise it with your notes, copy it to the clipboard, or reject it.",
       "source": "./plugins/refine"
     }
   ]
