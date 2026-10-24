@@ -22,7 +22,7 @@ bash plugins/babysit-pr/scripts/test/test-pr-snapshot.sh
 Each plugin lives in `plugins/<name>/` with skills auto-discovered from `skills/<skill>/SKILL.md`. Manifests that must stay in sync:
 
 - `.claude-plugin/marketplace.json` lists every plugin (Claude Code). Its `description` mirrors the plugin's `plugin.json` description.
-- `.agents/plugins/marketplace.json` lists only the Codex/Copilot-compatible plugins: `eli`, `refine`, `teach-me`, `unslop`, `visual-prompt`, `docstyle`.
+- `.agents/plugins/marketplace.json` lists only the Codex/Copilot-compatible plugins: `eli`, `refine`, `teach-me`, `unslop`, `visual-prompt`, `docstyle`. Its entries use `"source": {"source": "local", "path": "./plugins/<name>"}`, not the plain string of the Claude marketplace.
 - Those six plugins have three manifests with the same `version` and `description`: `.claude-plugin/plugin.json` (Claude Code), `.codex-plugin/plugin.json` (Codex, adds `skills` and `interface`), and a root `plugin.json` (Copilot CLI).
 
 When changing a plugin's behavior, bump its `version` in every manifest it has. When adding a plugin or changing which hosts it supports, update both marketplaces and the README (plugin table, install commands, Requirements, Usage, Codex and Copilot sections).
@@ -38,7 +38,7 @@ A 12-stage Polish novel pipeline (stage table in `plugins/book-forge/README.md`,
 - Stages hand data to each other through files in the user's book directory: human-facing `*.html`, `ksiazka.md` and `pakiet.md` in the root; everything else in a hidden `.book-forge/`. The canon ("biblia") is `.book-forge/biblia/**/*.md`.
 - `scripts/bible.py` is the single library and CLI for the canon: markdown pages whose frontmatter is JSON (not YAML), merged by `load_all()` into one object whose 17 sections are defined in `shared/biblia-spec.md`. Skills call `bible.py check-stage <stage>` as a preflight before launching an expensive swarm, and `bible.py status` for progress. Series mode nests everything under `tom-NN/` via the `BOOK_DIR`, `WORK` and `BIBLE_DIR` env vars.
 - Fields are RO or RUNTIME (see `biblia-spec.md`). Only `continuity-check` writes canon from the prose stages.
-- Most stage skills follow one pattern: `SKILL.md` gathers input, `references/workflow-swarm.md` holds the Workflow agent-swarm script (fallback: parallel Task agents), `references/build-and-verify.md` defines the `DATA` object injected into `assets/*-template.html` and the validation (`node --check` on the generated HTML script).
+- Most stage skills follow one pattern: `SKILL.md` gathers input, `references/workflow-swarm.md` holds the Workflow agent-swarm script (fallback: parallel Task agents), `references/build-and-verify.md` defines the `DATA` object injected into `assets/*-template.html` and the validation (`node --check` on the generated HTML script). `forge-scenes` is the exception: an orchestrator without its own swarm that runs the 7–10 scene loop by chaining the stage skills.
 - `shared/polish-style.md` is the shared Polish style guide. Most stages run a `/unslop:unslop` pass (a cross-plugin dependency), but scene prose gets it only in `polish-pl`, after `continuity-check`, so `write-scene` must not run it.
 - `scripts/echo.py` is the repetition detector used by `assemble-book`.
 
