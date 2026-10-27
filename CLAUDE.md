@@ -25,7 +25,7 @@ Each plugin lives in `plugins/<name>/` with skills auto-discovered from `skills/
 - `.agents/plugins/marketplace.json` lists only the Codex/Copilot-compatible plugins: `eli`, `refine`, `teach-me`, `unslop`, `visual-prompt`, `docstyle`. Its entries use `"source": {"source": "local", "path": "./plugins/<name>"}`, not the plain string of the Claude marketplace.
 - Those six plugins have three manifests with the same `version` and `description`: `.claude-plugin/plugin.json` (Claude Code), `.codex-plugin/plugin.json` (Codex, adds `skills` and `interface`), and a root `plugin.json` (Copilot CLI).
 
-When changing a plugin's behavior, bump its `version` in every manifest it has. When adding a plugin or changing which hosts it supports, update both marketplaces and the README (plugin table, install commands, Requirements, Usage, Codex and Copilot sections).
+When changing a plugin's behavior, bump its `version` in every manifest it has. When adding a plugin or changing which hosts it supports, update both marketplaces and the README (plugin list, Requirements, and the Codex and Copilot sections).
 
 Skills for the six cross-host plugins must not assume Claude-only tools: each `SKILL.md` has an `## Agent compatibility` section mapping to the host's equivalents (for example `ask_user` or numbered chat choices instead of `AskUserQuestion`; `spawn_agent` / `task` instead of Workflow/Agent).
 

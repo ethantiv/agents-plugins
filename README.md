@@ -1,183 +1,71 @@
 # agents-plugins
 
-A plugin marketplace for [Claude Code](https://claude.com/claude-code), with Codex and GitHub Copilot CLI support for `eli`, `refine`, `teach-me`, `unslop`, `visual-prompt`, and `docstyle`. Add the marketplace once, then install the plugins you need.
+Marketplace wtyczek dla [Claude Code](https://claude.com/claude-code). Wtyczki `docstyle`, `eli`, `refine`, `teach-me`, `unslop` i `visual-prompt` działają też w Codex i GitHub Copilot CLI.
 
-## Plugins
+Dostępne wtyczki: `babysit-pr`, `book-forge`, `dependency-update`, `docstyle`, `eli`, `read-arxiv-paper`, `refine`, `roadmap`, `teach-me`, `unslop` i `visual-prompt`. Wtyczki są od siebie niezależne, więc instaluj tylko te, których potrzebujesz.
 
-| Plugin | Language | What it does |
-| --- | --- | --- |
-| **book-forge** | Polish | A 12-stage novel-writing pipeline run by an agent swarm: from a market gap and an idea, through an outline and a "book bible", to writing, editing, and a submission package. Every stage ends with a mandatory edit for natural Polish (no AI slop). |
-| **babysit-pr** | universal | A local equivalent of `autofix-pr`: it watches the current pull request and fixes it in your Claude Code session, covering CI failures, review comments that request changes, and merge conflicts. After one clean pass it merges the PR and deletes the branch. Run it with `--loop` to keep watching on an interval, or `--push` to commit, push, and open the PR first. |
-| **read-arxiv-paper** | universal | Downloads the LaTeX source of an arXiv paper, analyzes it, and writes a summary grounded in the context of your project. |
-| **roadmap** | universal | Generates `docs/ROADMAP.md` with an agent swarm: multiple perspectives propose features, then a panel of product managers scores them for usefulness, sellability, and wow factor. |
-| **teach-me** | Polish by default | An interactive tutor that walks you step by step to a deep understanding of a topic (a code change, a PR, a file, or an abstract concept): it explains at the level you choose, checks each step with a quiz, tells you whether you were right and why, and adapts the difficulty as you progress. Verified items go into a checklist file, so you can pause and resume. |
-| **visual-prompt** | universal | Generates three `.txt` files with artistic text-to-image prompts in three contrasting directions, written in parallel by separate subagents in the conversation language. Two profiles: `art` (artwork, posters, photography) and `ui` (artistic interface mockups). Commands: `/visual-prompt-art`, `/visual-prompt-ui`. |
-| **dependency-update** | universal | Scans your project's dependencies across all ecosystems and updates them safely: minor and patch updates in one pass, major updates one at a time with separate research for each. |
-| **eli** | universal | Explain like I'm an intern: explains any concept, term, or piece of code to a smart person who lacks the domain knowledge. Short, concrete, example-driven, no padding. |
-| **refine** | universal | Rewrites a chaotic, stream-of-consciousness prompt into a clear, structured one: removes filler, false starts, and typos, resolves self-corrections in favor of your latest intent, and keeps every real requirement without adding new ones. Then asks whether to accept it (the agent starts working on it), revise it with your notes, copy it to the clipboard, or reject it. |
-| **docstyle** | universal | Applies the [Google developer documentation style guide](https://developers.google.com/style) to technical docs. `/docstyle` edits files in place (or reports findings with `--audit`) and activates automatically when you create or edit technical documentation. It does not style chat replies or install session hooks. Ships the full guide (70 pages) as local references with a topic index. |
-| **unslop** | universal | Edits LLM-generated documents in place to remove the telltale signs of AI writing catalogued by Wikipedia's ["Signs of AI writing"](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing): AI vocabulary, negative parallelisms, rule of three, promotional tone, vague attributions, throat-clearing, fake-profound kickers, formatting slop—plus Polish officialese and bureaucratic heaviness. Handles Polish and English. Audit mode reports findings with red, yellow, or green severity instead of editing; `/unslop:plain` rewrites Polish into plain language (a deliberate register change). The plugin provides skills only; it does not inject instructions at session start. |
+## Instalacja w Claude Code
 
-## Installation
+1. Dodaj marketplace:
 
-In a Claude Code session, add the marketplace and install the plugins you need with the built-in `/plugin` command:
+   ```bash
+   claude plugin marketplace add ethantiv/agents-plugins
+   ```
 
-```text
-/plugin marketplace add ethantiv/agents-plugins
-/plugin install book-forge@ethantiv-plugins
-/plugin install babysit-pr@ethantiv-plugins
-/plugin install read-arxiv-paper@ethantiv-plugins
-/plugin install roadmap@ethantiv-plugins
-/plugin install teach-me@ethantiv-plugins
-/plugin install visual-prompt@ethantiv-plugins
-/plugin install dependency-update@ethantiv-plugins
-/plugin install eli@ethantiv-plugins
-/plugin install refine@ethantiv-plugins
-/plugin install docstyle@ethantiv-plugins
-/plugin install unslop@ethantiv-plugins
-```
+2. Zainstaluj wtyczkę, na przykład `unslop`:
 
-Alternatively, add the marketplace and install plugins from your terminal:
+   ```bash
+   claude plugin install unslop@ethantiv-plugins
+   ```
 
-```bash
-claude plugin marketplace add ethantiv/agents-plugins
-claude plugin install book-forge@ethantiv-plugins
-claude plugin install babysit-pr@ethantiv-plugins
-claude plugin install read-arxiv-paper@ethantiv-plugins
-claude plugin install roadmap@ethantiv-plugins
-claude plugin install teach-me@ethantiv-plugins
-claude plugin install visual-prompt@ethantiv-plugins
-claude plugin install dependency-update@ethantiv-plugins
-claude plugin install eli@ethantiv-plugins
-claude plugin install refine@ethantiv-plugins
-claude plugin install docstyle@ethantiv-plugins
-claude plugin install unslop@ethantiv-plugins
-```
+3. Sprawdź instalację:
 
-Install only what you need; the plugins are independent of each other. To verify the installation, run the following command:
+   ```bash
+   claude plugin marketplace list
+   ```
 
-```bash
-claude plugin marketplace list
-```
+W sesji Claude Code możesz zamiast tego użyć poleceń `/plugin marketplace add` i `/plugin install`.
 
-## Requirements
-
-All plugins work with Claude Code. The six plugins listed in the introduction also support Codex and GitHub Copilot CLI. The following requirements apply in addition to the host CLI:
-
-**book-forge**
-
-- Python 3, standard library only, no `pip install`.
-- Node.js, used to validate generated HTML artifacts (`node --check`).
-- The Workflow tool (agent swarm); without it the skills fall back to parallel `Task` agents.
-- The `/unslop:unslop` skill (the `unslop` plugin from this marketplace), a mandatory language-editing pass.
-- The agent-browser skill, used for research and fact checking; project page: [agent-browser.dev](https://agent-browser.dev).
-
-Install both skills with:
-
-```bash
-claude plugin install unslop@ethantiv-plugins
-npx skills add https://github.com/vercel-labs/agent-browser --skill agent-browser
-```
-
-agent-browser has two components: the skill integrates with Claude Code through the `npx skills add` command, and the CLI controls the browser. The skill requires the CLI. Install or run the CLI before using the skill:
-
-```bash
-npm install -g agent-browser      # all platforms
-brew install agent-browser        # macOS
-agent-browser install             # downloads Chrome on first run
-
-# or without installing
-npx agent-browser open example.com
-```
-
-**babysit-pr**
-
-- `gh` (GitHub CLI, logged in), `jq`, and `git` available in `PATH`.
-- Optional: the `commit-commands` plugin for `--push` (without it, the skill commits and opens the PR with `git` and `gh`).
-- Optional: `BABYSIT_MERGE_METHOD` (`merge`, `squash`, or `rebase`; default `merge`) and `BABYSIT_REVIEW_WORKFLOW` (review workflow file; default `claude-code-review.yml`).
-
-**read-arxiv-paper**
-
-- `curl` and `tar` (usually already on your system), used to download and unpack the arXiv source.
-
-**roadmap**
-
-- The Workflow tool (agent swarm); without it the skill falls back to parallel `Task` agents.
-
-**eli**, **refine**, **unslop**, **docstyle**
-
-- No dependencies beyond the host CLI.
-
-**teach-me**
-
-- Optional: a shell for randomizing quiz choices; Git for code-change lessons and authenticated `gh` for GitHub PR lessons.
-
-**visual-prompt**
-
-- Native subagent tools: Workflow or Agent in Claude Code, `spawn_agent` in Codex, or `task` in Copilot CLI. Without delegation, the skill asks before producing the three directions sequentially.
-
-**dependency-update**
-
-- The package managers of your ecosystems (for example, `npm`, `pip`, `cargo`, or `go`) available in `PATH`, used to check for and install updates.
-
-## Usage
-
-After installation, each plugin exposes its skills as `/<plugin>:<skill>` commands.
-
-- **book-forge**: Read the full pipeline description in [`plugins/book-forge/README.md`](plugins/book-forge/README.md) and the visual guide to the 12 stages in [`przewodnik.html`](plugins/book-forge/przewodnik.html). Start with `/book-forge:market-report` (or the lighter `/book-forge:idea-spark`).
-- **babysit-pr**: Run `/babysit-pr` on a branch with an open PR to monitor and fix CI, reviews, and conflicts locally; once a pass completes without issues, it merges the PR and deletes the branch. `/babysit-pr --loop 10m` keeps watching by re-running the check every 10 minutes (you choose the interval). If you have no open PR, run `/babysit-pr --push` to commit your work, push it, open the PR, and start the same watch loop.
-- **read-arxiv-paper**: Run `/read-arxiv-paper:read-arxiv-paper` with a paper URL or ID (for example, `2401.12345`) to get a summary in the context of your repository.
-- **roadmap**: Run `/roadmap:roadmap` to gather ideas with an agent swarm and write `docs/ROADMAP.md`.
-- **teach-me**: Run `/teach-me:teach-me` with a topic (a code change, a PR, a file, or a concept); it explains first, checks each step, adapts the difficulty, and lets you pause and resume (type `pauza`).
-- **visual-prompt**: Run `/visual-prompt-art` or `/visual-prompt-ui` (or describe what you need) to generate three `.txt` files with prompts in contrasting directions.
-- **dependency-update**: Run `/dependency-update:dependency-update` to scan and safely update your project's dependencies.
-- **eli**: Run `/eli:eli` with a concept, term, or piece of code to get a short, vivid explanation.
-- **refine**: Run `/refine:refine` followed by your raw prompt. It shows the cleaned-up version and asks you to accept it (the agent then carries it out), revise it with notes (repeats until you accept), copy it to the clipboard without running anything, or reject it.
-- **docstyle**: Run `/docstyle:docstyle` with a file path (or directory) to edit documentation in place according to the Google developer documentation style guide; `--audit` reports severity-graded findings instead. Creating or editing documentation also triggers the skill. Its rules apply to documentation only, not ordinary chat replies.
-- **unslop**: Run `/unslop:unslop` with a file path (or directory) to remove signs of AI writing from the document in place. The skill reports what it fixed. Add `--audit` (or ask for "tylko audyt") to get severity-graded findings without edits. `/unslop:plain` with a file path simplifies bureaucratic Polish into plain language.
-
-## Codex CLI
-
-Native Codex packages are available for `unslop`, `eli`, `refine`, `visual-prompt`, `teach-me`, and `docstyle`. Claude Code uses the marketplace and manifests.
+## Instalacja w Codex
 
 ```sh
 codex plugin marketplace add ethantiv/agents-plugins
 codex plugin add unslop@ethantiv-plugins
-codex plugin add eli@ethantiv-plugins
-codex plugin add refine@ethantiv-plugins
-codex plugin add visual-prompt@ethantiv-plugins
-codex plugin add teach-me@ethantiv-plugins
-codex plugin add docstyle@ethantiv-plugins
 ```
 
-For local development, register the repository directory instead of the GitHub source. After installation, restart the session. Invoke `$unslop:unslop`, `$unslop:plain`, `$eli:eli`, `$refine:refine`, `$visual-prompt:visual-prompt`, `$visual-prompt:visual-prompt-art`, `$visual-prompt:visual-prompt-ui`, `$teach-me:teach-me`, or `$docstyle:docstyle`.
+Uruchom sesję ponownie i wywołaj skill jako `$<wtyczka>:<skill>`, na przykład `$unslop:unslop`.
 
-Skills use the tools available in their host; teach-me and refine fall back to numbered chat choices when Codex has no interactive question tool. Visual-prompt uses Codex subagents when available.
-
-## GitHub Copilot CLI
-
-The same six plugins use the `ethantiv-plugins` marketplace:
+## Instalacja w GitHub Copilot CLI
 
 ```sh
 copilot plugin marketplace add ethantiv/agents-plugins
-copilot plugin install eli@ethantiv-plugins
-copilot plugin install refine@ethantiv-plugins
-copilot plugin install teach-me@ethantiv-plugins
 copilot plugin install unslop@ethantiv-plugins
-copilot plugin install visual-prompt@ethantiv-plugins
-copilot plugin install docstyle@ethantiv-plugins
 ```
 
-After installation, start a new session. Invoke `/eli`, `/refine`, `/teach-me`, `/unslop`, `/plain`, `/visual-prompt`, `/visual-prompt-art`, `/visual-prompt-ui`, or `/docstyle`. If another installed plugin has the same skill name, use the skill picker.
+Rozpocznij nową sesję i wywołaj skill jako `/<skill>`, na przykład `/unslop`. Jeśli dwie wtyczki mają skill o tej samej nazwie, wybierz go z listy skilli.
 
-Teach-me and refine use `ask_user` when available and otherwise wait for numbered choices in chat. Visual-prompt uses native subagents. See the [Copilot CLI skill and tool reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-command-reference).
+## Wymagania
 
-### Devcontainer configuration
+Wtyczki, których nie ma w tabeli, potrzebują tylko CLI hosta.
 
-In `build-cli-devcontainer`, both `claude.plugins.external` and `copilot.plugins.external` list the six names under `marketplace: ethantiv-plugins` and `source: ethantiv/agents-plugins`. In `ai-devcontainer-sync`, `defaults.codex.plugins` uses one entry per plugin with the same marketplace and source.
+| Wtyczka | Wymagania |
+| --- | --- |
+| `book-forge` | Python 3, Node.js, wtyczka `unslop` oraz skill i CLI agent-browser |
+| `babysit-pr` | `git`, `jq` i `gh` zalogowane do GitHuba |
+| `read-arxiv-paper` | `curl` i `tar` |
+| `dependency-update` | Menedżery pakietów twojego projektu, na przykład `npm` albo `pip`, w `PATH` |
+| `teach-me` | Opcjonalnie: Git do lekcji o zmianach w kodzie i `gh` do lekcji o PR |
 
-The setup scripts install the published repository version. To make local edits available through that source, publish them to the repository.
+Żeby zainstalować skill i CLI agent-browser dla `book-forge`, uruchom:
 
-## License
+```bash
+npx skills add https://github.com/vercel-labs/agent-browser --skill agent-browser
+npm install -g agent-browser
+agent-browser install
+```
 
-[MIT](LICENSE). Use, modify, and redistribute freely.
+Żeby zmienić sposób scalania w `babysit-pr`, ustaw `BABYSIT_MERGE_METHOD` na `merge` (domyślnie), `squash` albo `rebase`. Jeśli workflow recenzji nazywa się inaczej niż `claude-code-review.yml`, ustaw `BABYSIT_REVIEW_WORKFLOW`.
+
+## Licencja
+
+[MIT](LICENSE)
