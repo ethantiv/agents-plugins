@@ -1,6 +1,6 @@
 {
   "name": "babysit-pr",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "Local equivalent of autofix-pr: monitor and fix the current PR (CI failures, review comments, merge conflicts) in the local Claude Code session, then merge it and delete its branch once a pass is clean",
   "author": {
     "name": "Mirek Zaniewicz"

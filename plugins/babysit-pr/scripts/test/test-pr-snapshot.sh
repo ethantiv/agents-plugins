@@ -8,6 +8,8 @@
 #   - review threads from every GraphQL page are kept, with author trust
 #   - a failed or malformed review read is gh_error, never an empty list
 #   - unpushed commits without the Babysit-PR trailer are flagged foreign
+#   - a token that may not read the check rollup gets the checks from Actions
+#     runs (latest run per workflow) and commit statuses; an unreadable source is gh_error
 
 set -uo pipefail
 
@@ -68,12 +70,33 @@ cat > "$tmp/fixtures/reviews_pages.json" <<'EOF'
  {"user":{"login":"carol"},"state":"COMMENTED","body":"c2","submitted_at":"2026-01-03T01:00:00Z"}]
 EOF
 
+# workflow 1: an older failed run superseded by a newer success; workflow 2 still running
+cat > "$tmp/fixtures/runs.json" <<'EOF'
+{"total_count":3,"workflow_runs":[
+  {"workflow_id":1,"name":"Review","status":"completed","conclusion":"failure","created_at":"2026-01-01T00:00:00Z","html_url":"https://example.test/actions/runs/1"},
+  {"workflow_id":1,"name":"Review","status":"completed","conclusion":"success","created_at":"2026-01-02T00:00:00Z","html_url":"https://example.test/actions/runs/2"},
+  {"workflow_id":2,"name":"Tests","status":"in_progress","conclusion":null,"created_at":"2026-01-02T00:00:00Z","html_url":"https://example.test/actions/runs/3"}]}
+EOF
+cat > "$tmp/fixtures/status.json" <<'EOF'
+{"state":"failure","statuses":[{"context":"deploy/preview","state":"failure","target_url":"https://ci.example.test/1"}]}
+EOF
+
 cat > "$tmp/bin/gh" <<EOF
 #!/usr/bin/env bash
 case "\$*" in
   *defaultBranchRef*) echo "main" ;;
   *nameWithOwner*)    echo "o/r" ;;
-  "pr view"*)         cat "$tmp/fixtures/pr.json" ;;
+  "pr view"*statusCheckRollup*)
+    case "\${GH_STUB_MODE:-}" in
+      rollup_denied|statuses_fail)
+        echo "GraphQL: Resource not accessible by personal access token (repository.pullRequest.statusCheckRollup)" >&2; exit 1 ;;
+      *) cat "$tmp/fixtures/pr.json" ;;
+    esac ;;
+  "pr view"*)         jq 'del(.statusCheckRollup)' "$tmp/fixtures/pr.json" ;;
+  *actions/runs*)     cat "$tmp/fixtures/runs.json" ;;
+  *commits/*/status*)
+    [ "\${GH_STUB_MODE:-}" = statuses_fail ] && { echo "HTTP 403" >&2; exit 1; }
+    cat "$tmp/fixtures/status.json" ;;
   *graphql*)
     case "\${GH_STUB_MODE:-}" in
       graphql_fail) echo "API rate limit exceeded" >&2; exit 1 ;;
@@ -124,5 +147,16 @@ out="$(GH_STUB_MODE=graphql_fail bash "$snapshot")"
 assert "graphql failure is error"  "$(field "$out" .status)" "gh_error"
 out="$(GH_STUB_MODE=graphql_nopr bash "$snapshot")"
 assert "missing PR data is error"  "$(field "$out" .status)" "gh_error"
+
+out="$(bash "$snapshot")"
+assert "rollup readable"           "$(field "$out" .checks_source)" "rollup"
+out="$(GH_STUB_MODE=rollup_denied bash "$snapshot")"
+assert "denied rollup still ok"    "$(field "$out" .status)" "ok"
+assert "checks from actions"       "$(field "$out" .checks_source)" "actions"
+assert "superseded failure gone"   "$(field "$out" '[.failing_checks[].name] | index("Review")')" "null"
+assert "failed status kept"        "$(field "$out" '[.failing_checks[].name] | join(",")')" "deploy/preview"
+assert "running workflow pending"  "$(field "$out" '[.pending_checks[].name] | join(",")')" "Tests"
+out="$(GH_STUB_MODE=statuses_fail bash "$snapshot")"
+assert "unreadable statuses error" "$(field "$out" .status)" "gh_error"
 
 exit "$fail"

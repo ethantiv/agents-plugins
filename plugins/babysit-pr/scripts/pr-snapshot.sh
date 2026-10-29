@@ -22,6 +22,8 @@
 #   has_conflicts       — bool (mergeable == CONFLICTING or mergeStateStatus == DIRTY)
 #   failing_checks[]    — {name, conclusion, url}  (CI checks that failed)
 #   pending_checks[]    — {name}                   (CI checks still running)
+#   checks_source       — rollup | actions  (actions: the token may not read the PR's
+#                          check rollup, so checks come from Actions runs and commit statuses)
 #   review_threads[]    — {thread_id, user, trusted, path, line, body, created_at, is_outdated}
 #                          (UNRESOLVED inline review threads only, all pages; thread_id feeds
 #                           resolveReviewThread / addPullRequestReviewThreadReply)
@@ -59,14 +61,20 @@ fi
 
 errf="$(mktemp)"; trap 'rm -f "$errf"' EXIT
 
-fields="number,state,url,headRefName,headRefOid,baseRefName,mergeable,mergeStateStatus,statusCheckRollup"
-if [[ -n "$pr_number" ]]; then
-  pr_json="$(gh pr view "$pr_number" --json "$fields" 2>"$errf")"
-else
-  pr_json="$(gh pr view --json "$fields" 2>"$errf")"
-fi
+fields="number,state,url,headRefName,headRefOid,baseRefName,mergeable,mergeStateStatus"
+view() { gh pr view ${pr_number:+"$pr_number"} --json "$1" 2>"$errf"; }
+pr_json="$(view "$fields,statusCheckRollup")"
 gh_rc=$?
 gh_msg="$(cat "$errf" 2>/dev/null)"
+checks_source=rollup
+# A fine-grained token cannot hold the Checks permission, and a private repo hides the rollup
+# without it: read the PR without the rollup and rebuild the checks from Actions runs below.
+if [[ $gh_rc -ne 0 ]] && grep -q 'statusCheckRollup' <<<"$gh_msg" && grep -qi 'not accessible' <<<"$gh_msg"; then
+  checks_source=actions
+  pr_json="$(view "$fields")"
+  gh_rc=$?
+  gh_msg="$(cat "$errf" 2>/dev/null)"
+fi
 
 if [[ $gh_rc -ne 0 || -z "$pr_json" ]]; then
   if printf '%s' "$gh_msg" | grep -qi "no .*pull request\|no pull requests\|Could not resolve to a PullRequest\|no open"; then
@@ -85,6 +93,21 @@ number="$(printf '%s' "$pr_json" | jq -r .number)"
 slug="$(gh repo view --json nameWithOwner -q .nameWithOwner 2>/dev/null || echo "")"
 [[ -n "$slug" ]] || err "gh_error" "cannot resolve repository (gh repo view failed)"
 owner="${slug%%/*}"; name="${slug##*/}"
+
+if [[ $checks_source == actions ]]; then
+  sha="$(printf '%s' "$pr_json" | jq -r .headRefOid)"
+  runs_raw="$(gh api --paginate "repos/$slug/actions/runs?head_sha=$sha&per_page=100" 2>"$errf")" \
+    || err "gh_error" "checks unavailable: $(cat "$errf")"
+  statuses_raw="$(gh api "repos/$slug/commits/$sha/status" 2>"$errf")" \
+    || err "gh_error" "checks unavailable (commit statuses need the Commit statuses permission): $(cat "$errf")"
+  # The latest run of each workflow on the head commit, shaped like rollup entries, then the commit statuses.
+  checks_json="$(jq -n --argjson s "$statuses_raw" --slurpfile r <(printf '%s' "$runs_raw") '
+    ([$r[].workflow_runs[]] | group_by(.workflow_id) | map(max_by(.created_at))
+      | map({name, status: (.status | ascii_upcase), conclusion: ((.conclusion // "") | ascii_upcase), detailsUrl: .html_url}))
+    + [$s.statuses[] | {context, state: (.state | ascii_upcase), targetUrl: .target_url}]' 2>/dev/null)" \
+    || err "gh_error" "checks unavailable: unexpected response"
+  pr_json="$(printf '%s' "$pr_json" | jq --argjson c "$checks_json" '.statusCheckRollup = $c')"
+fi
 
 # shellcheck disable=SC2016  # $owner/$name/$number/$endCursor are GraphQL variables, bound via -f/-F below
 gql='query($owner:String!,$name:String!,$number:Int!,$endCursor:String){
@@ -129,6 +152,7 @@ jq -n \
   --argjson unpushed "$unpushed" \
   --argjson foreign "$foreign" \
   --argjson behind "$behind" \
+  --arg source "$checks_source" \
   --arg branch "$current_branch" '
   def trusted(assoc; bot): bot or (assoc | IN("OWNER","MEMBER","COLLABORATOR"));
   ($pr.statusCheckRollup // []) as $checks
@@ -144,6 +168,7 @@ jq -n \
       mergeable: $pr.mergeable,
       mergeStateStatus: $pr.mergeStateStatus,
       has_conflicts: (($pr.mergeable == "CONFLICTING") or ($pr.mergeStateStatus == "DIRTY")),
+      checks_source: $source,
       failing_checks: [
         $checks[]
         | select(
