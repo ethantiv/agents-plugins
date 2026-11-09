@@ -23,9 +23,9 @@ Each plugin lives in `plugins/<name>/` with skills auto-discovered from `skills/
 
 - `.claude-plugin/marketplace.json` lists every plugin (Claude Code). Its `description` mirrors the plugin's `plugin.json` description.
 - `.agents/plugins/marketplace.json` lists only the Codex/Copilot-compatible plugins: `eli`, `refine`, `teach-me`, `unslop`, `visual-prompt`, `docstyle`. Its entries use `"source": {"source": "local", "path": "./plugins/<name>"}`, not the plain string of the Claude marketplace.
-- Those six plugins have three manifests with the same `version` and `description`: `.claude-plugin/plugin.json` (Claude Code), `.codex-plugin/plugin.json` (Codex, adds `skills` and `interface`), and a root `plugin.json` (Copilot CLI).
+- Those six plugins have three manifests with the same `version` and `description`: `.claude-plugin/plugin.json` (Claude Code), `.codex-plugin/plugin.json` (Codex, adds `skills` and `interface`), and a root `plugin.json` (Copilot CLI). The Codex manifest repeats the description in `interface.longDescription`; keep it equal.
 
-When changing a plugin's behavior, bump its `version` in every manifest it has. When adding a plugin or changing which hosts it supports, update both marketplaces and the README (plugin list, Requirements, and the Codex and Copilot sections).
+When changing a plugin's behavior, bump its `version` in every manifest it has. When adding a plugin or changing which hosts it supports, update both marketplaces and the Polish README (plugin list, `Wymagania`, and the Codex and Copilot sections).
 
 Skills for the six cross-host plugins must not assume Claude-only tools: each `SKILL.md` has an `## Agent compatibility` section mapping to the host's equivalents (for example `ask_user` or numbered chat choices instead of `AskUserQuestion`; `spawn_agent` / `task` instead of Workflow/Agent).
 
@@ -44,7 +44,7 @@ A 12-stage Polish novel pipeline (stage table in `plugins/book-forge/README.md`,
 
 ## babysit-pr architecture
 
-`SKILL.md` drives the loop; deterministic decisions live in scripts. `pr-snapshot.sh` prints a JSON snapshot of the PR (checks, review threads, conflicts), which `SKILL.md` tees to `$(git rev-parse --git-path babysit-pr-snapshot.json)`; `auto-gate.sh` reads it on stdin and decides whether the PR is clean enough to merge (and at which head sha). `restart-review.sh` reruns the review workflow after threads are resolved. Keep merge-safety logic in `auto-gate.sh` and covered by its test. Fix commits carry a `Babysit-PR: fix` trailer; the snapshot flags unpushed commits without it as foreign.
+`SKILL.md` drives the loop; deterministic decisions live in scripts. `pr-snapshot.sh` prints a JSON snapshot of the PR (checks, review threads, conflicts), which `SKILL.md` tees to `$(git rev-parse --git-path babysit-pr-snapshot.json)`; `auto-gate.sh` reads it on stdin and decides whether the PR is clean enough to merge (and at which head sha). `restart-review.sh` reruns the review workflow after threads are resolved. Keep merge-safety logic in `auto-gate.sh` and covered by its test. Fix commits carry a `Babysit-PR: fix` trailer; the snapshot flags unpushed commits without it as foreign. Env overrides: `BABYSIT_MERGE_METHOD` (merge|squash|rebase), `BABYSIT_REVIEW_WORKFLOW` (default `claude-code-review.yml`).
 
 ## Distribution
 
