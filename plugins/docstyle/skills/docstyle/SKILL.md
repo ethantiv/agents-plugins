@@ -2,8 +2,8 @@
 name: docstyle
 description: >-
   This skill should be used when the user asks to "apply the Google style guide", "check documentation style", "review this README for style", "fix the docs style", "make this follow docstyle", "edit per the developer documentation style guide", "popraw styl dokumentacji", "zastosuj przewodnik stylu Google", or invokes /docstyle — and also whenever developer documentation is being written or substantially edited in the session (README, tutorial, how-to, API reference, user guide), where its rules apply to the prose being produced. Covers audit-only requests: "audit the docs style", "report style issues without editing". Applies the Google developer documentation style guide (developers.google.com/style), shipped in full as local references. Not for removing AI-slop patterns, rewriting Polish into plain language, or prose that is not technical documentation (fiction, marketing copy, chat messages).
-argument-hint: "<file path(s) to fix, or a directory> [--audit]"
-allowed-tools: Read, Edit, Grep, Glob
+argument-hint: "<file path(s) to fix, or a directory> [--audit] | on | off"
+allowed-tools: Read, Edit, Grep, Glob, Bash(touch:*), Bash(rm:*)
 ---
 
 ## Agent compatibility
@@ -16,7 +16,7 @@ Edit the document(s) in `$ARGUMENTS` **in place** so they follow the [Google dev
 
 ## Workflow
 
-1. **Resolve targets.** If `$ARGUMENTS` contains the flag `--audit`, strip it and run in audit mode (see below) instead of editing. The rest of `$ARGUMENTS` may hold one or more file paths or a directory (expand it with `Glob` pattern `**/*.md`; other extensions inside a directory are skipped — name them explicitly to include them). Empty → if documentation writing is already in progress in the conversation, skip the workflow and apply the guide to all documentation prose produced from that point on; otherwise ask in one sentence which file to fix — don't guess.
+1. **Resolve targets.** If `$ARGUMENTS` is exactly `on` or `off`, follow [Chat style](#chat-style-on--off) and stop. If `$ARGUMENTS` contains the flag `--audit`, strip it and run in audit mode (see below) instead of editing. The rest of `$ARGUMENTS` may hold one or more file paths or a directory (expand it with `Glob` pattern `**/*.md`; other extensions inside a directory are skipped — name them explicitly to include them). Empty → if documentation writing is already in progress in the conversation, skip the workflow and apply the guide to all documentation prose produced from that point on; otherwise ask in one sentence which file to fix — don't guess.
 2. **Read each file whole** (long files in sequential chunks). Apply the core rules below directly; they cover most findings.
 3. **Consult the guide for anything beyond the core rules.** `Read` [references/index.md](references/index.md) — a topic → page map — and load only the pages matching the issues actually present in the text. For rulings on a specific term (for example "allowlist", "click", "e-mail", "please"), `Grep` [references/guide/word-list.md](references/guide/word-list.md) for the term instead of reading the whole page.
 4. **Fix with surgical `Edit` calls** — sentence-level replacements, not a wholesale rewrite. The author's structure and voice stay; the style violations go.
@@ -43,9 +43,16 @@ The always-apply subset; the index maps everything else.
 
 With `--audit`, produce a report instead of editing. For each file list the findings grouped by guide topic, each with: severity (**high** — misleads or blocks the reader: ambiguous instructions, future promises, wrong person/tense in procedures; **medium** — clear guide violations: title case headings, "click here" links, passive procedures, superlatives; **low** — polish: serial commas, contractions, number formatting), the location (`file:line`), a quoted fragment, the proposed fix, and the guide page it comes from. End with a per-file tally by severity. Make no edits in audit mode.
 
+## Chat style (`on` / `off`)
+
+In Claude Code the plugin ships a SessionStart hook that puts the core rules into every new session, so chat replies follow them. It is on by default. The switch is a flag file; other hosts have no such hook, so say so there and do nothing.
+
+- `off` → run `touch "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/docstyle-chat-off"`, stop applying the rules to chat replies in this session, and confirm in one line.
+- `on` → run `rm -f "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/docstyle-chat-off"`, apply the core rules to chat replies from now on (language scope as in the hard rules), and confirm in one line.
+
 ## Scope boundaries
 
-- Apply these rules only to documentation being created, edited, or audited. Do not activate a persistent session mode or restyle ordinary chat replies, commit messages, or unrelated prose.
+- The file workflow applies only to documentation being created, edited, or audited. Chat replies follow the core rules only through the chat-style hook; never restyle commit messages or unrelated prose.
 - Removing AI-writing patterns (negative parallelisms, fake-profound kickers, AI vocabulary) is a different job: if the unslop plugin is installed, use `/unslop:unslop` for it.
 - Deliberately simplifying Polish officialese into plain language: if the unslop plugin is installed, that is `/unslop:plain`.
 - This skill styles developer documentation; leave fiction, marketing copy, and conversational text alone.

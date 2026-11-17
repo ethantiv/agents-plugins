@@ -2,7 +2,7 @@
 
 ## What this is
 
-A plugin marketplace (`ethantiv-plugins`) published from `ethantiv/agents-plugins`. Almost everything is prompt content (`SKILL.md` plus `references/`, `assets/`, `examples/`); the only executable code is in `plugins/book-forge/scripts/` (Python 3, stdlib only) and `plugins/babysit-pr/scripts/` (bash + `gh` + `jq`). There is no build step and no package manager.
+A plugin marketplace (`ethantiv-plugins`) published from `ethantiv/agents-plugins`. Almost everything is prompt content (`SKILL.md` plus `references/`, `assets/`, `examples/`); the only executable code is in `plugins/book-forge/scripts/` (Python 3, stdlib only), `plugins/babysit-pr/scripts/` (bash + `gh` + `jq`) and `plugins/docstyle/hooks/` (bash). There is no build step and no package manager.
 
 ## Tests
 
@@ -13,6 +13,7 @@ python3 plugins/book-forge/scripts/tests/test_bible.py
 python3 plugins/book-forge/scripts/tests/test_echo.py
 bash plugins/babysit-pr/scripts/test/test-auto-gate.sh
 bash plugins/babysit-pr/scripts/test/test-pr-snapshot.sh
+bash plugins/docstyle/hooks/test/test-chat-style.sh
 ```
 
 `test_bible.py` works in a temp dir via `BIBLE_DIR`; it never touches real book projects.
@@ -45,6 +46,10 @@ A 12-stage Polish novel pipeline (stage table in `plugins/book-forge/README.md`,
 ## babysit-pr architecture
 
 `SKILL.md` drives the loop; deterministic decisions live in scripts. `pr-snapshot.sh` prints a JSON snapshot of the PR (checks, review threads, conflicts), which `SKILL.md` tees to `$(git rev-parse --git-path babysit-pr-snapshot.json)`; `auto-gate.sh` reads it on stdin and decides whether the PR is clean enough to merge (and at which head sha). `restart-review.sh` reruns the review workflow after threads are resolved. Keep merge-safety logic in `auto-gate.sh` and covered by its test. Fix commits carry a `Babysit-PR: fix` trailer; the snapshot flags unpushed commits without it as foreign. Env overrides: `BABYSIT_MERGE_METHOD` (merge|squash|rebase), `BABYSIT_REVIEW_WORKFLOW` (default `claude-code-review.yml`).
+
+## docstyle chat-style hook
+
+`plugins/docstyle/hooks/hooks.json` registers a Claude Code-only SessionStart hook; `chat-style.sh` prints a preamble plus the `## Core rules` section cut out of `SKILL.md` (keep that heading). `/docstyle:docstyle off|on` creates or removes the flag file `${CLAUDE_CONFIG_DIR:-~/.claude}/docstyle-chat-off`, which silences the hook.
 
 ## Distribution
 
