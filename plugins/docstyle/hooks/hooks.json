@@ -5,7 +5,17 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/chat-style.sh\"",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/chat-style.sh\" core",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/chat-style.sh\" polish-a",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/chat-style.sh\" polish-b",
             "timeout": 10
           }
         ]

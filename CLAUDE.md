@@ -49,7 +49,7 @@ A 12-stage Polish novel pipeline (stage table in `plugins/book-forge/README.md`,
 
 ## docstyle chat-style hook
 
-`plugins/docstyle/hooks/hooks.json` registers a Claude Code-only SessionStart hook; `chat-style.sh` prints a preamble plus the `## Core rules` section cut out of `SKILL.md` (keep that heading). `/docstyle:docstyle off|on` creates or removes the flag file `${CLAUDE_CONFIG_DIR:-~/.claude}/docstyle-chat-off`, which silences the hook.
+`plugins/docstyle/hooks/hooks.json` registers a Claude Code-only SessionStart hook; `hooks.json` runs `chat-style.sh` three times (`core`, `polish-a`, `polish-b`) because Claude Code swaps hook stdout over 10,000 characters for a file path and a preview. `core` prints a preamble plus the `## Core rules` section cut out of `SKILL.md` (keep that heading); the Polish parts print `references/polish/plain-polish.md` and `polish-patterns.md`, split at the `## Formulaic AI Structures` heading. `references/polish/` in docstyle and the miodkuj files in `plugins/unslop/skills/unslop/references/` are verbatim copies of [miodkuj](https://github.com/bartekpucek/miodkuj) (MIT); refresh them from upstream instead of editing. `/docstyle:docstyle off|on` creates or removes the flag file `${CLAUDE_CONFIG_DIR:-~/.claude}/docstyle-chat-off`, which silences the hook.
 
 ## Distribution
 

@@ -1,7 +1,7 @@
 {
   "name": "docstyle",
-  "version": "0.2.0",
-  "description": "Apply the Google developer documentation style guide when creating, editing, or auditing technical documentation. Edits files in place; --audit reports findings without edits. Ships the full guide (70 pages) as local references with a topic index. In Claude Code a SessionStart hook also applies the core rules to chat replies; /docstyle:docstyle on|off toggles it (default on).",
+  "version": "0.3.0",
+  "description": "Apply the Google developer documentation style guide when creating, editing, or auditing technical documentation. Edits files in place; --audit reports findings without edits. Ships the full guide (70 pages) as local references with a topic index. In Claude Code a SessionStart hook also applies the core rules, plus Polish style rules for Polish, to chat replies; /docstyle:docstyle on|off toggles it (default on).",
   "author": {
     "name": "Mirek Zaniewicz"
   }

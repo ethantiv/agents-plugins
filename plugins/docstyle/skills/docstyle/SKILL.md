@@ -26,7 +26,7 @@ Hard rules:
 
 - **Never change technical meaning.** Command names, flags, API signatures, outputs, and version numbers stay exactly as written. If a technical claim looks wrong, flag it in the summary instead of editing it.
 - **Don't touch:** code blocks and inline code (except prose inside code comments when the user asked for it), URLs, quoted material, proper names, YAML frontmatter keys, data values in tables.
-- **Language scope.** The guide is written for English. Apply the full rule set to English prose. To prose in other languages apply only the structural rules (second person, active voice, present tense, conditions before instructions, list and heading discipline, descriptive links, no future promises, no excessive claims) — never anglicize spelling, punctuation, or word choice.
+- **Language scope.** The guide is written for English. Apply the full rule set to English prose. To prose in other languages apply only the structural rules (second person, active voice, present tense, conditions before instructions, list and heading discipline, descriptive links, no future promises, no excessive claims) — never anglicize spelling, punctuation, or word choice. To Polish prose also apply the [Polish rules](#polish-rules).
 - **Respect the project's existing conventions** where the guide itself defers to them (see `guide/index.md` on precedence): an established API's naming, a repo's heading style used consistently. Note the conflict in the summary rather than churning the whole file.
 
 ## Core rules
@@ -39,13 +39,17 @@ The always-apply subset; the index maps everything else.
 
 **Formatting and organization** — sentence case for titles and headings; numbered lists for sequences, bulleted for unordered sets; procedure steps start with the imperative verb; serial comma; code font for code, filenames, commands, and literal values; bold for UI element names; unambiguous dates (spell out the month); one idea per paragraph, point first.
 
+## Polish rules
+
+For Polish prose, `Read` [references/polish/polish-patterns.md](references/polish/polish-patterns.md) and [references/polish/plain-polish.md](references/polish/plain-polish.md), and apply them on top of the structural rules: keep the listed patterns out of text you write, and fix them in text you edit. Honor each pattern's "Keep" list and false-positive guard, and the hard rules above — technical terms, code, and quoted material stay exact.
+
 ## Audit mode
 
 With `--audit`, produce a report instead of editing. For each file list the findings grouped by guide topic, each with: severity (**high** — misleads or blocks the reader: ambiguous instructions, future promises, wrong person/tense in procedures; **medium** — clear guide violations: title case headings, "click here" links, passive procedures, superlatives; **low** — polish: serial commas, contractions, number formatting), the location (`file:line`), a quoted fragment, the proposed fix, and the guide page it comes from. End with a per-file tally by severity. Make no edits in audit mode.
 
 ## Chat style (`on` / `off`)
 
-In Claude Code the plugin ships a SessionStart hook that puts the core rules into every new session, so chat replies follow them. It is on by default. The switch is a flag file; other hosts have no such hook, so say so there and do nothing.
+In Claude Code the plugin ships a SessionStart hook that puts the core rules and both Polish reference files into every new session, so chat replies follow them. It is on by default. The switch is a flag file; other hosts have no such hook, so say so there and do nothing.
 
 - `off` → run `touch "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/docstyle-chat-off"`, stop applying the rules to chat replies in this session, and confirm in one line.
 - `on` → run `rm -f "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/docstyle-chat-off"`, apply the core rules to chat replies from now on (language scope as in the hard rules), and confirm in one line.
@@ -53,6 +57,10 @@ In Claude Code the plugin ships a SessionStart hook that puts the core rules int
 ## Scope boundaries
 
 - The file workflow applies only to documentation being created, edited, or audited. Chat replies follow the core rules only through the chat-style hook; never restyle commit messages or unrelated prose.
-- Removing AI-writing patterns (negative parallelisms, fake-profound kickers, AI vocabulary) is a different job: if the unslop plugin is installed, use `/unslop:unslop` for it.
+- Removing AI-writing patterns (negative parallelisms, fake-profound kickers, AI vocabulary) beyond the Polish rules is a different job: if the unslop plugin is installed, use `/unslop:unslop` for it.
 - Deliberately simplifying Polish officialese into plain language: if the unslop plugin is installed, that is `/unslop:plain`.
 - This skill styles developer documentation; leave fiction, marketing copy, and conversational text alone.
+
+---
+
+`references/polish/` is copied verbatim from [miodkuj](https://github.com/bartekpucek/miodkuj), Copyright (c) 2026 Bartek Pucek, MIT License.
