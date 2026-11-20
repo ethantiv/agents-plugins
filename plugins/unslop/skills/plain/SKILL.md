@@ -17,7 +17,7 @@ Rewrite the Polish document(s) in `$ARGUMENTS` **in place** into plain language 
 ## Workflow
 
 1. **Resolve targets.** `$ARGUMENTS` may hold one or more file paths or a directory (expand with `Glob` patterns `**/*.md` and `**/*.txt`; other extensions inside a directory are skipped — name them explicitly to include them). Empty → take the file the user points at in their message; if none, ask in one sentence which file to simplify.
-2. **Read each file whole** and identify its job and reader. Then `Read` `../unslop/references/polish-patterns.md` — its officialese, nominalization, passive-fog, genitive-chain, and participle patterns are the core of this pass, applied here without the register restraint (naming the actor and addressing the reader directly is the point, not a risk).
+2. **Read each file whole** and identify its job and reader. Then `Read` `../unslop/references/plain-polish.md` (the plain-Polish guide: principles, simplifications, and what never to simplify away) and `../unslop/references/polish-patterns.md` — its officialese, nominalization, passive-fog, genitive-chain, and participle patterns are the core of this pass, applied here without the register restraint (naming the actor and addressing the reader directly is the point, not a risk).
 3. **Simplify with surgical `Edit` calls**, sentence by sentence. Principles:
    - Start with what the reader needs to know or do; legal basis and background move below the action.
    - Address the reader directly (`złóż wniosek`, `możesz odwołać się`) where the text instructs; name the actor (`urząd wyda decyzję`) where it informs.
