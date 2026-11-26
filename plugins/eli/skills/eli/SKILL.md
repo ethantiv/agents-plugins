@@ -1,7 +1,7 @@
 ---
 name: eli
 description: >-
-  This skill should be used when the user wants a short, one-shot explanation of a concept, term, acronym, or piece of code, pitched at a smart adult with zero knowledge of that domain — concrete, example-driven, never childish. Not for interactive lessons, quizzes, or step-by-step PR walkthroughs (use teach-me for those). Triggers: "wytłumacz jak stażyście", "wytłumacz prosto", "wytłumacz po ludzku", "wyjaśnij jak laikowi", "wyjaśnij obrazowo", "wyjaśnij na przykładzie", "co to w ogóle jest X", "wytłumacz mi to krótko", "explain like I'm an intern", "ELI intern", "ELI5", or invoking the eli skill.
+  This skill should be used when the user wants a short, one-shot explanation of a concept, term, acronym, or piece of code, pitched at a smart adult with zero knowledge of that domain — concrete, example-driven, never childish. Not for interactive lessons, quizzes, or step-by-step PR walkthroughs. Triggers: "wytłumacz jak stażyście", "wytłumacz prosto", "wytłumacz po ludzku", "wyjaśnij jak laikowi", "wyjaśnij obrazowo", "wyjaśnij na przykładzie", "co to w ogóle jest X", "wytłumacz mi to krótko", "explain like I'm an intern", "ELI intern", "ELI5", or invoking the eli skill.
 argument-hint: "[concept | term | path | snippet]  — empty = the last thing discussed"
 allowed-tools: Read, Grep, Glob, WebSearch, WebFetch
 ---
@@ -42,6 +42,6 @@ The whole point is **short, vivid, concrete**. A senior engineer skimming it sho
 - **No jargon without paying for it.** If a term is unavoidable, define it in the same breath, in plain words. Don't explain one unknown with three more.
 - **Length matches the subject, and stays tight.** A term → a few sentences, no headings, and never label the four steps. A gnarly system → still compact, no walls of text; headings only when it has several distinct parts. Every sentence earns its place; if a line only restates the previous one, cut it.
 - **Show, don't pad.** A good example beats a paragraph of qualifiers. Reach for an analogy, a number, or a 3-line snippet before reaching for more sentences.
-- **One pass, done.** This is a one-shot explanation, not a tutoring session. If the user wants to go deeper or be quizzed, point them to teach-me — `/teach-me:teach-me` in Claude Code, `$teach-me:teach-me` in Codex, `/teach-me` in Copilot CLI — only if it is installed.
+- **One pass, done.** This is a one-shot explanation, not a tutoring session.
 
-Stop after the explanation. Do not end with a question or a menu of options; mention teach-me only if the user asked to go deeper or be quizzed.
+Stop after the explanation. Do not end with a question or a menu of options.

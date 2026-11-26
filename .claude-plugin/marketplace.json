@@ -11,16 +11,6 @@
       "source": "./plugins/babysit-pr"
     },
     {
-      "name": "book-forge",
-      "description": "Kompletny pipeline do tworzenia powieści rojem agentów (Workflow), 12 etapów: od luki rynkowej i pomysłu, przez konspekt, biblię książki, pisanie i redakcję scen ze spójnością opartą na biblii, po złożony maszynopis i pakiet wydawniczy. Każdy etap z obowiązkową redakcją na poprawną, naturalną polszczyznę (unslop, anty-AI-slop); research przez agent-browser w etapach analitycznych i world-research.",
-      "source": "./plugins/book-forge"
-    },
-    {
-      "name": "dependency-update",
-      "description": "Scan project dependencies across all ecosystems and update them safely — minor/patch in a sweep, major bumps researched one at a time",
-      "source": "./plugins/dependency-update"
-    },
-    {
       "name": "docstyle",
       "description": "Apply the Google developer documentation style guide when creating, editing, or auditing technical documentation. Edits files in place; --audit reports findings without edits. Ships the full guide (70 pages) as local references with a topic index. In Claude Code a SessionStart hook also applies the core rules, plus Polish style rules for Polish, to chat replies; /docstyle:docstyle on|off toggles it (default on).",
       "source": "./plugins/docstyle"
@@ -36,19 +26,9 @@
       "source": "./plugins/read-arxiv-paper"
     },
     {
-      "name": "roadmap",
-      "description": "Generate docs/ROADMAP.md via an agent swarm: many perspectives propose features, a product-manager panel scores them for usefulness, sellability and wow-factor",
-      "source": "./plugins/roadmap"
-    },
-    {
       "name": "unslop",
       "description": "Edit LLM-generated documents to remove telltale signs of AI writing (per Wikipedia's \"Signs of AI writing\"): AI vocabulary, negative parallelisms, rule of three, promotional tone, vague attributions, throat-clearing, fake-profound kickers, formatting slop — plus Polish officialese and bureaucratic heaviness. Polish and English. Audit mode reports findings with severity instead of editing; /unslop:plain rewrites Polish into plain language.",
       "source": "./plugins/unslop"
-    },
-    {
-      "name": "teach-me",
-      "description": "Interactive tutor for a code change, PR, file, or abstract topic: explains at your chosen level, checks every step with a multiple-choice question and explicit right/wrong feedback, drills into the \"why\", and adapts the difficulty as you go; tracks verified items in a markdown or HTML checklist you can pause and resume.",
-      "source": "./plugins/teach-me"
     },
     {
       "name": "visual-prompt",
