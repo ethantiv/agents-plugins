@@ -2,7 +2,7 @@
 
 Marketplace wtyczek dla [Claude Code](https://claude.com/claude-code). Wtyczki `docstyle`, `eli`, `refine`, `unslop` i `visual-prompt` działają też w Codex i GitHub Copilot CLI.
 
-Dostępne wtyczki: `babysit-pr`, `docstyle`, `eli`, `read-arxiv-paper`, `refine`, `unslop` i `visual-prompt`. Wtyczki są od siebie niezależne, więc instaluj tylko te, których potrzebujesz.
+Dostępne wtyczki: `babysit-pr`, `docstyle`, `eli`, `refine`, `unslop` i `visual-prompt`. Wtyczki są od siebie niezależne, więc instaluj tylko te, których potrzebujesz.
 
 ## Instalacja w Claude Code
 
@@ -51,7 +51,6 @@ Wtyczki, których nie ma w tabeli, potrzebują tylko CLI hosta.
 | Wtyczka | Wymagania |
 | --- | --- |
 | `babysit-pr` | `git`, `jq` i `gh` zalogowane do GitHuba |
-| `read-arxiv-paper` | `curl` i `tar` |
 
 Żeby zmienić sposób scalania w `babysit-pr`, ustaw `BABYSIT_MERGE_METHOD` na `merge` (domyślnie), `squash` albo `rebase`. Jeśli workflow recenzji nazywa się inaczej niż `claude-code-review.yml`, ustaw `BABYSIT_REVIEW_WORKFLOW`.
 
