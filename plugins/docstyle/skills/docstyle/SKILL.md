@@ -58,7 +58,6 @@ In Claude Code the plugin ships a SessionStart hook that puts the core rules and
 
 - The file workflow applies only to documentation being created, edited, or audited. Chat replies follow the core rules only through the chat-style hook; never restyle commit messages or unrelated prose.
 - Removing AI-writing patterns (negative parallelisms, fake-profound kickers, AI vocabulary) beyond the Polish rules is a different job: if the unslop plugin is installed, use `/unslop:unslop` for it.
-- Deliberately simplifying Polish officialese into plain language: if the unslop plugin is installed, that is `/unslop:plain`.
 - This skill styles developer documentation; leave fiction, marketing copy, and conversational text alone.
 
 ---

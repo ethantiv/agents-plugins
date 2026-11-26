@@ -5,7 +5,7 @@ Load this file when the target text contains Polish. Below the unslop notes it c
 ## unslop notes (these override the catalog)
 
 - **Cluster rule.** These are cluster-sensitive signals, not absolute bans. One `kluczowy`, one triad, one passive sentence proves nothing — a competent human writes all of these occasionally. Act when several items cluster in a passage, and check each pattern's "Keep" or false-positive guard before editing. When in doubt, leave the sentence alone; a false positive that flattens correct formal Polish is worse than a missed hit.
-- **Register restraint.** In the unslop pass, switch to direct address (`należy złożyć wniosek` → `złóż wniosek`) only where the register already allows it; unslopping never informalizes. `/unslop:plain` deliberately overrides this restraint and the "Keep" guards, since its whole job is the register change.
+- **Register restraint.** In the unslop pass, switch to direct address (`należy złożyć wniosek` → `złóż wniosek`) only where the register already allows it; unslopping never informalizes.
 
 ---
 
